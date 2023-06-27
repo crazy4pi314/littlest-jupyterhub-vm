@@ -9,7 +9,7 @@
         "value": "${AZURE_LOCATION}"
       },
       "vmAdminUsername": {
-        "value": "${VM_ADMIN_USERNAME='jupyter'}"
+        "value": "${VM_ADMIN_USERNAME='tljhadmin'}"
       },
       "vmAdminPassword": {
         "value": "$(secretOrRandomPassword)"
