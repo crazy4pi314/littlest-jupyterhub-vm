@@ -8,10 +8,10 @@
       "location": {
         "value": "${AZURE_LOCATION}"
       },
-      "adminUsername": {
-        "value": "${ADMIN_USERNAME}"
+      "vmAdminUsername": {
+        "value": "${VM_ADMIN_USERNAME='jupyter'}"
       },
-      "adminPassword": {
+      "vmAdminPassword": {
         "value": "$(secretOrRandomPassword)"
     }
   }

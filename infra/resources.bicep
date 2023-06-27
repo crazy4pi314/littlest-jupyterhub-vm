@@ -1,82 +1,57 @@
 param location string
 param resourceToken string
 param tags object
-param adminUsername string
+param vmAdminUsername string
 @secure()
-param adminPassword string
+param vmAdminPassword string
 
 
 var abbrs = loadJsonContent('abbreviations.json')
-
-var networkSecurityGroupName = 'jupyter-vm-nsg'
-var nsgId = resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', networkSecurityGroupName)
-
-var virtualNetworkName = '${abbrs.networkVirtualNetworks}${resourceToken}'
 var subnetName = '${abbrs.networkVirtualNetworksSubnets}${resourceToken}'
-var addressPrefix = '10.0.0.0/16'
-var subnetPrefix = '10.0.0.0/24'
-// var vnetId = resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks', virtualNetworkName)
-// var vnetId = virtualNetwork.id
 
-var publicIPAddressName = 'jupyter-PublicIP'
-// @description('SKU for the public IP visit https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-ip-addresses-overview-arm#sku for more info.')
+@description('SKU for the public IP visit https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-ip-addresses-overview-arm#sku for more info.')
 param publicIpAddressSku string = 'Basic'
 
-var nicName = 'jupyter-VMNic'
-// var subnetRef = '${vnetId}/subnets/${subnetName}'
-
-var storageAccountName = '${abbrs.storageStorageAccounts}${resourceToken}'
-// @description('Disk type for your VM storage. Check https://docs.microsoft.com/en-us/azure/virtual-machines/windows/disks-types for reference.')
-// @allowed([
-//   'StandardSSD_LRS'
-//   'Standard_LRS'
-//   'Premium_LRS'
-// ])
+@description('Disk type for your VM storage. Check https://docs.microsoft.com/en-us/azure/virtual-machines/windows/disks-types for reference.')
+@allowed([
+  'StandardSSD_LRS'
+  'Standard_LRS'
+  'Premium_LRS'
+])
 param osDiskType string = 'Standard_LRS'
 
-var dataDiskResourcesName = '${abbrs.computeDisks}${resourceToken}'
-// @description('Data disk size - this is attached to your VM for storage.')
-// @allowed([
-//   1024
-//   2048
-//   4096
-//   8192
-//   16384
-//   32767
-// ])
+@description('The URL where the install script is located. If you do not require additional plugins or custom installs leave the default')
+param scriptLocation string = 'https://raw.githubusercontent.com/crazy4pi314/littlest-jupyterhub-vm/scripts/vm-install.sh'
+
+@description('Data disk size - this is attached to your VM for storage.')
+@allowed([
+  1024
+  2048
+  4096
+  8192
+  16384
+  32767
+])
 param dataDiskSize int = 1024
 
-// @description('Virtual machine name. Use a meaningful name.')
+@description('Virtual machine name.')
 param virtualMachineName string = 'ljh-vm'//'${abbrs.computeVirtualMachines}${resourceToken}'
-// @description('Your Virtual Machine size see https://docs.microsoft.com/en-us/azure/virtual-machines/linux/sizes-general')
-// @allowed([
-//   'CPU-8GB'
-//   'CPU-14GB'
-//   'CPU-16GB'
-//   'CPU-28GB'
-//   'CPU-32GB'
-//   'CPU-64GB'
-//   'CPU-112GB'
-//   'CPU-128GB'
-//   'CPU-256Gb'
-//   'CPU-432Gb'
-// ])
+
+@description('Your Virtual Machine size see https://docs.microsoft.com/en-us/azure/virtual-machines/linux/sizes-general')
+@allowed([
+  'CPU-8GB'
+  'CPU-14GB'
+  'CPU-16GB'
+  'CPU-28GB'
+  'CPU-32GB'
+  'CPU-64GB'
+  'CPU-112GB'
+  'CPU-128GB'
+  'CPU-256Gb'
+  'CPU-432Gb'
+])
 param virtualMachineSize string = 'CPU-64GB'
 
-// @description('Username for admin user.')
-// param adminUsername string
-
-// @description('Root password, you need this to access the admin functions.')
-// @secure()
-// param adminPassword string
-
-// @description('The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version.')
-// @allowed([
-//   '18.04-LTS'
-//   '20.04-LTS'
-//   '22_04-lts-gen2'
-// ])
-param ubuntuOSVersion string = '22_04-lts-gen2'
 var vmSize = {
   'CPU-8GB': 'Standard_F4s_v2'
   'CPU-14GB': 'Standard_DS3_v2'
@@ -90,12 +65,23 @@ var vmSize = {
   'CPU-432Gb': 'Standard E64_v3'
 }
 
-// @description('The URL where the install script is located. If you do not require additional plugins or custom installs leave the default')
-param scriptLocation string = 'https://raw.githubusercontent.com/trallard/TLJH-azure-button/master/scripts/install.sh'
+// @description('Username for admin user.')
+// param adminUsername string
+
+// @description('Root password, you need this to access the admin functions.')
+// @secure()
+// param adminPassword string
+
+@description('The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version.')
+@allowed([
+  '22_04-lts-gen2'
+])
+param ubuntuOSVersion string = '22_04-lts-gen2'
+
 
 
 resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2019-06-01' = {
-  name: networkSecurityGroupName
+  name: '${abbrs.networkNetworkSecurityGroups}${resourceToken}'
   location: location
   properties: {
     securityRules: [
@@ -143,20 +129,20 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2019-06-0
 }
 
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
-  name: virtualNetworkName
+  name: '${abbrs.networkVirtualNetworks}${resourceToken}'
   location: location
   tags: tags
   properties: {
     addressSpace: {
       addressPrefixes: [
-        addressPrefix
+        '10.0.0.0/16'
       ]
     }
     subnets: [
       {
         name: subnetName
         properties: {
-          addressPrefix: subnetPrefix
+          addressPrefix: '10.0.0.0/24'
           // delegations: [
           //   {
           //     name: 'subnet-delegation-${resourceToken}'
@@ -178,7 +164,7 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
 }
 
 resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2022-07-01' = {
-  name: publicIPAddressName
+  name: '${abbrs.networkPublicIPAddresses}${resourceToken}'
   location: location
   tags: tags
   properties: {
@@ -191,7 +177,7 @@ resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2022-07-01' = {
 }
 
 resource nic 'Microsoft.Network/networkInterfaces@2019-06-01' = {
-  name: nicName
+  name: '${abbrs.networkNetworkInterfaces}${resourceToken}'
   location: location
   properties: {
     ipConfigurations: [
@@ -203,24 +189,24 @@ resource nic 'Microsoft.Network/networkInterfaces@2019-06-01' = {
           }
           privateIPAllocationMethod: 'Dynamic'
           publicIPAddress: {
-            id: resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', publicIPAddressName)
+            id: publicIpAddress.id
           }
         }
       }
     ]
     networkSecurityGroup: {
-      id: nsgId
+      id: networkSecurityGroup.id
+      //id: nsgId
     }
   }
   dependsOn: [
-    networkSecurityGroup
-    publicIpAddress
+    //publicIpAddress
     // virtualNetwork
   ]
 }
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2019-06-01' = {
-  name: storageAccountName
+  name: '${abbrs.storageStorageAccounts}${resourceToken}'
   location: location
   sku: {
     name: osDiskType
@@ -230,7 +216,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2019-06-01' = {
 }
 
 resource dataDiskResources 'Microsoft.Compute/disks@2018-06-01' = {
-  name: dataDiskResourcesName
+  name: '${abbrs.computeDisks}${resourceToken}'
   location: location
   sku: {
     name: osDiskType
@@ -265,7 +251,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2019-07-01' = {
       }
       dataDisks: [
         {
-          name: dataDiskResourcesName
+          name: dataDiskResources.name
           lun: 0
           createOption: 'attach'
           managedDisk: {
@@ -283,8 +269,8 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2019-07-01' = {
     }
     osProfile: {
       computerName: virtualMachineName
-      adminUsername: adminUsername
-      adminPassword: adminPassword
+      adminUsername: vmAdminUsername
+      adminPassword: vmAdminPassword
     }
   }
   dependsOn: [
@@ -307,15 +293,15 @@ resource installScript 'Microsoft.Compute/virtualMachines/extensions@2019-07-01'
     typeHandlerVersion: '2.0'
     autoUpgradeMinorVersion: true
     protectedSettings: {
-      commandToExecute: 'basename ${scriptLocation} | xargs -I % bash "%" ${adminUsername}'
+      commandToExecute: 'basename ${scriptLocation} | xargs -I % bash "%" ${vmAdminUsername}'
       fileUris: [
         scriptLocation
       ]
     }
   }
   dependsOn: [
-    virtualMachine
+    //virtualMachine
   ]
 }
 
-output adminUsername string = adminUsername
+output vmAdminUsername string = vmAdminUsername

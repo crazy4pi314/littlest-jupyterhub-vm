@@ -16,11 +16,11 @@ param location string
 @minLength(1)
 @maxLength(64)
 @description('Name of the admin user on the JupyerHub instance.')
-param adminUsername string
+param vmAdminUsername string
 
 @secure()
 @description('Password for the admin user on the JupyerHub instance.')
-param adminPassword string
+param vmAdminPassword string
 
 // Optional parameters to override the default azd resource naming conventions.
 // Add the following to main.parameters.json to provide values:
@@ -47,8 +47,8 @@ var resourceToken = toLower(uniqueString(subscription().id, environmentName, loc
 //   Microsoft.Web/sites for appservice, function
 // Example usage:
 //   tags: union(tags, { 'azd-service-name': apiServiceName })
-#disable-next-line no-unused-vars
-var apiServiceName = 'python-api'
+// #disable-next-line no-unused-vars
+// var apiServiceName = 'python-api'
 
 // Organize resources in a resource group
 resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
@@ -68,8 +68,8 @@ module resources 'resources.bicep' = {
     location: location
     resourceToken: resourceToken
     tags: tags
-    adminUsername: adminUsername
-    adminPassword: adminPassword
+    vmAdminUsername: vmAdminUsername
+    vmAdminPassword: vmAdminPassword
   }
 }
 
@@ -84,4 +84,4 @@ module resources 'resources.bicep' = {
 // To see these outputs, run `azd env get-values`,  or `azd env get-values --output json` for json output.
 output AZURE_LOCATION string = location
 output AZURE_TENANT_ID string = tenant().tenantId
-// output ADMIN_USERNAME = adminUsername
+output VM_ADMIN_USERNAME string = vmAdminUsername
