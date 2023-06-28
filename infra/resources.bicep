@@ -21,7 +21,7 @@ param publicIpAddressSku string = 'Basic'
 param osDiskType string = 'Standard_LRS'
 
 @description('The URL where the install script is located. If you do not require additional plugins or custom installs leave the default')
-param scriptLocation string = 'https://raw.githubusercontent.com/crazy4pi314/littlest-jupyterhub-vm/scripts/vm-install.sh'
+param scriptLocation string = 'https://raw.githubusercontent.com/crazy4pi314/littlest-jupyterhub-vm/main/scripts/vm-install.sh'
 
 @description('Data disk size - this is attached to your VM for storage.')
 @allowed([
@@ -64,13 +64,6 @@ var vmSize = {
   'CPU-256Gb': 'Standard_E32_v3'
   'CPU-432Gb': 'Standard E64_v3'
 }
-
-// @description('Username for admin user.')
-// param adminUsername string
-
-// @description('Root password, you need this to access the admin functions.')
-// @secure()
-// param adminPassword string
 
 @description('The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version.')
 @allowed([
@@ -143,14 +136,6 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         name: subnetName
         properties: {
           addressPrefix: '10.0.0.0/24'
-          // delegations: [
-          //   {
-          //     name: 'subnet-delegation-${resourceToken}'
-          //     properties: {
-          //       serviceName: 'Microsoft.Web/serverFarms'
-          //     }
-          //   }
-          // ]
         }
       }
     ]
@@ -158,9 +143,6 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
   resource subnet 'subnets' existing = {
     name: subnetName
   }
-  // resource webappSubnet 'subnets' existing = {
-  //   name: webappSubnetName
-  // }
 }
 
 resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2022-07-01' = {
