@@ -256,8 +256,6 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2019-07-01' = {
     }
   }
   dependsOn: [
-    // dataDiskResources
-
     storageAccount
   ]
 }
@@ -282,7 +280,6 @@ resource installScript 'Microsoft.Compute/virtualMachines/extensions@2019-07-01'
     }
   }
   dependsOn: [
-    //virtualMachine
   ]
 }
 
