@@ -12,7 +12,9 @@ This repo contains:
 
 ## Deployment
 
-Finally, run `azd up` to run the end-to-end infrastructure provisioning (`azd provision`) and deployment (`azd deploy`) flow. Visit the service endpoints listed to see your application up-and-running!
+Start by cloning the repo, and make sure you also log in to Azure with the azd cli tool.
+
+In the directory, run `azd up` to run the end-to-end infrastructure provisioning (`azd provision`) and deployment (`azd deploy`) flow. Visit the service endpoints listed to see your application up-and-running!
 
 ## Local development with Docker
 
