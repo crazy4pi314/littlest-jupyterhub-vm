@@ -21,7 +21,7 @@ param publicIpAddressSku string = 'Basic'
 param osDiskType string = 'Standard_LRS'
 
 @description('The URL where the install script is located. If you do not require additional plugins or custom installs leave the default')
-param scriptLocation string = 'https://raw.githubusercontent.com/crazy4pi314/littlest-jupyterhub-vm/main/scripts/vm-install.sh'
+param scriptLocation string = 'https://raw.githubusercontent.com/crazy4pi314/littlest-jupyterhub-vm/updating-azd/scripts/vm-install.sh'
 
 @description('Data disk size - this is attached to your VM for storage.')
 @allowed([
